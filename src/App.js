@@ -2,6 +2,7 @@ import "./index.css";
 import { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Stars, useAnimations } from "@react-three/drei";
+import { useFrame, useLoader } from "@react-three/fiber";
 
 // function Model({ ...props }) {
 //   const group = useRef();
@@ -52,25 +53,25 @@ import { OrbitControls, useGLTF, Stars, useAnimations } from "@react-three/drei"
 //   );
 // }
 
-// function Model(props) {
-//   const { nodes, materials } = useGLTF('/testshirt.gltf')
-//   return (
-//     <group {...props} dispose={null}>
-//       <mesh geometry={nodes.Cube.geometry} material={materials.Material} />
-//       <mesh geometry={nodes.Plane.geometry} material={materials.shirt} rotation={[0, 0, -Math.PI / 2]} scale={0.09} />
-//     </group>
-//   )
-// }
-
 function Model(props) {
+
+  const tshirtRef = useRef();
+
+  useFrame(({ clock }) => {
+    const elapsedTime = clock.getElapsedTime();
+    tshirtRef.current.rotation.y = elapsedTime / 1;
+  });
+
+
   const group = useRef()
   const { nodes, materials, animations } = useGLTF('/tee2_v2.gltf')
   const { actions } = useAnimations(animations, group)
+
   return (
     <group ref={group} {...props} dispose={null} scale={7}>
       <group name="Scene" >
         <mesh name="Seems" geometry={nodes.Seems.geometry} material={materials['Material #25.002']} position={[0, -1, -0.02]} scale={0.45} />
-        <mesh name="T-Shirt" geometry={nodes['T-Shirt'].geometry} material={materials['Material #26.001']} position={[0, -1, 0]} scale={0.03} />
+        <mesh ref={tshirtRef} name="T-Shirt" geometry={nodes['T-Shirt'].geometry} material={materials['Material #26.001']} position={[0, -1, 0]} scale={0.03} />
       </group>
     </group>
   )
@@ -128,7 +129,7 @@ function App() {
             position={[10, 15, 10]}
             castShadow
           />
-          <Stars  
+          <Stars
             radius={300}
             depth={60}
             count={20000}
@@ -136,7 +137,7 @@ function App() {
             saturation={0}
             fade={true}
           />
-          <Model/>
+          <Model />
           {/* <Model
             customColors={{ mesh: "red", stripes: "blue", soul: "green" }}
           /> */}
